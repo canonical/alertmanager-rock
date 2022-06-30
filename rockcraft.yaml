@@ -1,17 +1,44 @@
 name: alertmanager
 version: "0.24.0"
 base: ubuntu:20.04
+entrypoint: [ bin/alertmanager ]
+cmd: [ --config.file=/etc/alertmanager/alertmanager.yml, --storage.path=/alertmanager ]
 
 parts:
+#  alertmanager:
+#    plugin: dump
+#    source: https://github.com/prometheus/alertmanager/releases/download/v0.24.0/alertmanager-0.24.0.linux-amd64.tar.gz
+#    source-checksum: sha256/6fa982232ae7be5524f5b3cd4e90b7c6a75086368200c917644eaa3e806555dc
+#    organize:
+#      alertmanager: bin/alertmanager
+#      amtool: bin/amtool
+#      alertmanager.yml: etc/alertmanager/alertmanager.yml
+#    stage:
+#      - bin/alertmanager
+#      - bin/amtool
+#      - etc/alertmanager/alertmanager.yml
+
   alertmanager:
+    plugin: go
+    source: https://github.com/prometheus/alertmanager.git
+    source-commit: "f484b17fa3c583ed1b2c8bbcec20ba1db2aa5f11"
+    # Override until this issue is fixed: https://github.com/canonical/rockcraft/issues/21
+    build-snaps:
+      - go/1.17/stable
+#    organize:
+#      .build/linux-amd64/alertmanager: bin/alertmanager
+#      .build/linux-amd64/amtool: bin/amtool
+#      examples/ha/alertmanager.yml: etc/alertmanager/alertmanager.yml
+    stage:
+      - bin/alertmanager
+      - bin/amtool
+#      - etc/alertmanager/alertmanager.yml
+
+  default-config:
     plugin: dump
     source: https://github.com/prometheus/alertmanager/releases/download/v0.24.0/alertmanager-0.24.0.linux-amd64.tar.gz
     source-checksum: sha256/6fa982232ae7be5524f5b3cd4e90b7c6a75086368200c917644eaa3e806555dc
     organize:
-      alertmanager: bin/alertmanager
-      amtool: bin/amtool
       alertmanager.yml: etc/alertmanager/alertmanager.yml
     stage:
-      - bin/alertmanager
-      - bin/amtool
       - etc/alertmanager/alertmanager.yml

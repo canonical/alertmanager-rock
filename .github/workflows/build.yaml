@@ -18,16 +18,14 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Setup LXD
-      uses: whywaita/setup-lxd@v1
+      uses: canonical/setup-lxd@v0.1.0
       with:
-        lxd_version: latest/stable
+        channel: latest/stable
 
     - name: Install dependencies
       run: |
         sudo snap install yq
         sudo snap install --classic --channel edge rockcraft
-        sudo iptables -F FORWARD
-        sudo iptables -P FORWARD ACCEPT
 
     - name: Build ROCK
       run: rockcraft pack --verbose

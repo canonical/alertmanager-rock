@@ -45,20 +45,19 @@ jobs:
         shell: bash
         run: |
           source_tag="${{steps.check.outputs.release}}"
-          version=${source_tag#"v"} \
-          yq -i '.version = strenv(version) | .parts.alertmanager["source-tag"] = strenv(source_tag)' rockcraft.yaml
-          rm rockcraft.yaml
-          mv new.yaml rockcraft.yaml
+          version=${source_tag#"v"}
+          go_version=$(grep -Po "^go \K(\S+)" go.mod)
+          yq -i '.version = strenv(version) | .parts.alertmanager["source-tag"] = strenv(source_tag) | .parts.alertmanager["build-snaps"] = ["go/" + strenv(go_version) + "/stable"]' rockcraft.yaml
 
       - name: Create a PR
         if: ${{ steps.check.outputs.release != '' }}
         uses: peter-evans/create-pull-request@v4.2.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore(deps): bump mimir version to ${{ steps.check.outputs.release }}"
+          commit-message: "chore(deps): bump alertmanager version to ${{ steps.check.outputs.release }}"
           committer: "Github Actions <github-actions@github.com>"
           author: "Github Actions <github-actions@github.com>"
-          title: "Update to Mimir ${{ steps.check.outputs.release }}"
-          body: Automated update to follow upstream [release](https://github.com/grafana/mimir/releases/tag/${{ steps.check.outputs.release }}) of Mimir.
+          title: "Update to Alertmanager ${{ steps.check.outputs.release }}"
+          body: Automated update to follow upstream [release](https://github.com/prometheus/alertmanager/releases/tag/${{ steps.check.outputs.release }}) of Alertmanager.
           branch: "chore/bump-version-to-${{ steps.check.outputs.release }}"
           delete-branch: true

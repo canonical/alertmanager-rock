@@ -25,8 +25,6 @@ jobs:
 
       - name: Checkout the ROCK source
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
 
       - id: check
         name: Check for new releases
@@ -40,13 +38,21 @@ jobs:
             echo "No new upstream release found"
           fi
 
+      - id: alertmanager-go-version
+        name: Check alertmanager's recommended go version
+        uses: actions/checkout@v2
+        with:
+          repository: prometheus/alertmanager
+          ref: ${{steps.check.outputs.release}}
+          path: alertmanager-src
+
       - name: Update the version file and push a branch
         if: ${{ steps.check.outputs.release != '' }}
         shell: bash
         run: |
-          source_tag="${{steps.check.outputs.release}}"
-          version=${source_tag#"v"}
-          go_version=$(grep -Po "^go \K(\S+)" go.mod)
+          source_tag="${{steps.check.outputs.release}}" \
+          version=${source_tag#"v"} \
+          go_version=$(grep -Po "^go \K(\S+)" $GITHUB_WORKSPACE/alertmanager-src/go.mod) \
           yq -i '.version = strenv(version) | .parts.alertmanager["source-tag"] = strenv(source_tag) | .parts.alertmanager["build-snaps"] = ["go/" + strenv(go_version) + "/stable"]' rockcraft.yaml
 
       - name: Create a PR

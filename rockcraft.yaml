@@ -4,7 +4,6 @@ description: Alertmanager handles alerts sent by client applications such as the
 version: "0.24.0"
 base: ubuntu:20.04
 license: Apache-2.0
-
 # Replicate the tree structure of the original image
 # https://github.com/prometheus/alertmanager/blob/main/Dockerfile
 
@@ -15,15 +14,12 @@ license: Apache-2.0
 # └── etc
 #     └── alertmanager
 #         └── alertmanager.yml
-
 entrypoint: [bin/alertmanager]
 cmd: [--config.file=/etc/alertmanager/alertmanager.yml, --storage.path=/alertmanager]
 env:
   - PATH: /bin
-
 platforms:
   amd64:
-
 parts:
   alertmanager:
     plugin: go
@@ -50,7 +46,6 @@ parts:
     stage:
       - bin/alertmanager
       - bin/amtool
-
   default-config:
     plugin: dump
     source: .

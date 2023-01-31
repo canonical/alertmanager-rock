@@ -29,13 +29,15 @@ jobs:
           excludes: prerelease, draft
 
       - name: Checkout the ROCK source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          path: main
 
       - id: check
         name: Check for new releases
         shell: bash
         run: |
-          release=$(yq '.parts.alertmanager["source-tag"]' rockcraft.yaml)
+          release=$(yq '.parts.alertmanager["source-tag"]' $GITHUB_WORKSPACE/main/rockcraft.yaml)
           if [ "${release}" != "${{steps.latest-release.outputs.release}}" ]; then
             echo "release=${{steps.latest-release.outputs.release}}" >> $GITHUB_OUTPUT
             echo "New upstream release ${{steps.latest-release.outputs.release}} found"
@@ -45,7 +47,7 @@ jobs:
 
       - id: alertmanager-go-version
         name: Checkout alertmanager source (to get recommended go version)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: prometheus/alertmanager
           ref: ${{steps.check.outputs.release}}
@@ -58,12 +60,13 @@ jobs:
           source_tag="${{steps.check.outputs.release}}" \
           version=${source_tag#"v"} \
           go_version=$(grep -Po "^go \K(\S+)" $GITHUB_WORKSPACE/alertmanager-src/go.mod) \
-          yq -i '.version = strenv(version) | .parts.alertmanager["source-tag"] = strenv(source_tag) | .parts.alertmanager["build-snaps"] = ["go/" + strenv(go_version) + "/stable"]' rockcraft.yaml
+          yq -i '.version = strenv(version) | .parts.alertmanager["source-tag"] = strenv(source_tag) | .parts.alertmanager["build-snaps"] = ["go/" + strenv(go_version) + "/stable"]' $GITHUB_WORKSPACE/main/rockcraft.yaml
 
       - name: Create a PR
         if: ${{ steps.check.outputs.release != '' }}
         uses: peter-evans/create-pull-request@v4.2.3
         with:
+          path: main
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore(deps): bump alertmanager version to ${{ steps.check.outputs.release }}"
           committer: "Github Actions <github-actions@github.com>"

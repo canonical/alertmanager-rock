@@ -28,7 +28,7 @@ parts:
     source-tag: "v0.24.0"
     # Override until this issue is fixed: https://github.com/canonical/rockcraft/issues/21
     build-snaps:
-      - go/1.18/stable
+      - go/1.17/stable
     override-build: |
       set -x
       REVISION=$(git rev-parse --short HEAD)

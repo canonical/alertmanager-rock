@@ -32,17 +32,21 @@ parts:
     source-tag: "v0.24.0"
     # Override until this issue is fixed: https://github.com/canonical/rockcraft/issues/21
     build-snaps:
-      - go/1.17/stable
-
-#    override-build: |
-#      REVISION=$(git rev-parse --short HEAD)
-#      BRANCH=$(git rev-parse --abbrev-ref HEAD)
-#
-#      go build \
-#        -ldflags="-X github.com/prometheus/common/version.Version=$(cat ./VERSION) -X github.com/prometheus/common/version.Revision=${REVISION} -X github.com/prometheus/common/version.Branch=${BRANCH} -X github.com/prometheus/common/version.BuildUser=$(whoami)@$(hostname) -X github.com/prometheus/common/version.BuildDate=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-#        -o alertmanager \
-#        ./cmd/alertmanager
-
+      - go/1.18/stable
+    override-build: |
+      set -x
+      REVISION=$(git rev-parse --short HEAD)
+      BRANCH=$(git rev-parse --abbrev-ref HEAD)
+      go build \
+        -ldflags="-X github.com/prometheus/common/version.Version=$(cat ./VERSION) -X github.com/prometheus/common/version.Revision=${REVISION} -X github.com/prometheus/common/version.Branch=${BRANCH} -X github.com/prometheus/common/version.BuildUser=$(whoami)@$(hostname) -X github.com/prometheus/common/version.BuildDate=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+        -o bin/alertmanager \
+        ./cmd/alertmanager
+      go build \
+        -ldflags="-X github.com/prometheus/common/version.Version=$(cat ./VERSION) -X github.com/prometheus/common/version.Revision=${REVISION} -X github.com/prometheus/common/version.Branch=${BRANCH} -X github.com/prometheus/common/version.BuildUser=$(whoami)@$(hostname) -X github.com/prometheus/common/version.BuildDate=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+        -o bin/amtool \
+        ./cmd/amtool
+        install -D -m755 bin/alertmanager ${CRAFT_PART_INSTALL}/bin/alertmanager
+        install -D -m755 bin/amtool ${CRAFT_PART_INSTALL}/bin/amtool
     stage:
       - bin/alertmanager
       - bin/amtool
@@ -54,12 +58,3 @@ parts:
       alertmanager.yml: etc/alertmanager/alertmanager.yml
     stage:
       - etc/alertmanager/alertmanager.yml
-
-
-# TODO
-
-# Version data is missing:
-# $ docker run alertmanager:0.24.0 --version
-# alertmanager, version  (branch: , revision: )
-#   build user:
-#   build date:

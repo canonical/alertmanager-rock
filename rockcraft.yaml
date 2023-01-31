@@ -1,44 +1,65 @@
 name: alertmanager
+summary: Prometheus alertmanager in a ROCK.
+description: Alertmanager handles alerts sent by client applications such as the Prometheus server.
 version: "0.24.0"
 base: ubuntu:20.04
-entrypoint: [ bin/alertmanager ]
-cmd: [ --config.file=/etc/alertmanager/alertmanager.yml, --storage.path=/alertmanager ]
+license: Apache-2.0
+
+# Replicate the tree structure of the original image
+# https://github.com/prometheus/alertmanager/blob/main/Dockerfile
+
+# /
+# ├── bin
+# │   ├── alertmanager
+# │   └── amtool
+# └── etc
+#     └── alertmanager
+#         └── alertmanager.yml
+
+entrypoint: [bin/alertmanager]
+cmd: [--config.file=/etc/alertmanager/alertmanager.yml, --storage.path=/alertmanager]
+env:
+  - PATH: /bin
+
+platforms:
+  amd64:
 
 parts:
-#  alertmanager:
-#    plugin: dump
-#    source: https://github.com/prometheus/alertmanager/releases/download/v0.24.0/alertmanager-0.24.0.linux-amd64.tar.gz
-#    source-checksum: sha256/6fa982232ae7be5524f5b3cd4e90b7c6a75086368200c917644eaa3e806555dc
-#    organize:
-#      alertmanager: bin/alertmanager
-#      amtool: bin/amtool
-#      alertmanager.yml: etc/alertmanager/alertmanager.yml
-#    stage:
-#      - bin/alertmanager
-#      - bin/amtool
-#      - etc/alertmanager/alertmanager.yml
-
   alertmanager:
     plugin: go
     source: https://github.com/prometheus/alertmanager.git
-    source-commit: "f484b17fa3c583ed1b2c8bbcec20ba1db2aa5f11"
+    source-type: git
+    source-tag: "v0.24.0"
     # Override until this issue is fixed: https://github.com/canonical/rockcraft/issues/21
     build-snaps:
       - go/1.17/stable
-#    organize:
-#      .build/linux-amd64/alertmanager: bin/alertmanager
-#      .build/linux-amd64/amtool: bin/amtool
-#      examples/ha/alertmanager.yml: etc/alertmanager/alertmanager.yml
+
+#    override-build: |
+#      REVISION=$(git rev-parse --short HEAD)
+#      BRANCH=$(git rev-parse --abbrev-ref HEAD)
+#
+#      go build \
+#        -ldflags="-X github.com/prometheus/common/version.Version=$(cat ./VERSION) -X github.com/prometheus/common/version.Revision=${REVISION} -X github.com/prometheus/common/version.Branch=${BRANCH} -X github.com/prometheus/common/version.BuildUser=$(whoami)@$(hostname) -X github.com/prometheus/common/version.BuildDate=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+#        -o alertmanager \
+#        ./cmd/alertmanager
+
     stage:
       - bin/alertmanager
       - bin/amtool
-#      - etc/alertmanager/alertmanager.yml
 
   default-config:
     plugin: dump
-    source: https://github.com/prometheus/alertmanager/releases/download/v0.24.0/alertmanager-0.24.0.linux-amd64.tar.gz
-    source-checksum: sha256/6fa982232ae7be5524f5b3cd4e90b7c6a75086368200c917644eaa3e806555dc
+    source: .
     organize:
       alertmanager.yml: etc/alertmanager/alertmanager.yml
     stage:
       - etc/alertmanager/alertmanager.yml
+
+
+# TODO
+
+# Version data is missing:
+# $ docker run alertmanager:0.24.0 --version
+# alertmanager, version  (branch: , revision: )
+#   build user:
+#   build date:

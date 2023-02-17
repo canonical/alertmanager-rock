@@ -1,4 +1,7 @@
 # alertmanager-rock
+
+[![Build ROCK](https://github.com/canonical/alertmanager-rock/actions/workflows/build-rock.yaml/badge.svg)](https://github.com/canonical/alertmanager-rock/actions/workflows/build-rock.yaml)
+
 Build an alertmanager image using
 [rockcraft](https://github.com/canonical/rockcraft), maintaining the same file
 hierarchy as the

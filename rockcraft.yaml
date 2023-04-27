@@ -14,10 +14,12 @@ license: Apache-2.0
 # └── etc
 #     └── alertmanager
 #         └── alertmanager.yml
-entrypoint: [bin/alertmanager]
-cmd: [--config.file=/etc/alertmanager/alertmanager.yml, --storage.path=/alertmanager]
-env:
-  - PATH: /bin
+
+services:
+  alertmanager:
+    command: /bin/alertmanager --config.file=/etc/alertmanager/alertmanager.yml --storage.path=/alertmanager
+    override: replace
+    startup: enabled
 platforms:
   amd64:
 parts:

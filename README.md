@@ -1,31 +1,15 @@
 # alertmanager-rock
 
-[![Build ROCK](https://github.com/canonical/alertmanager-rock/actions/workflows/build-rock.yaml/badge.svg)](https://github.com/canonical/alertmanager-rock/actions/workflows/build-rock.yaml)
+[![Publish to GHCR:dev](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-release-dev.yaml/badge.svg)](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-release-dev.yaml)
+[![Update ROCK](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-update.yaml/badge.svg)](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-update.yaml)
 
-Build an alertmanager image using
-[rockcraft](https://github.com/canonical/rockcraft), maintaining the same file
-hierarchy as the
-[`prometheus/alertmanager`](https://github.com/prometheus/alertmanager/blob/main/Dockerfile)
-image.
+[ROCKs](https://canonical-rockcraft.readthedocs-hosted.com/en/latest/) for [Alertmanager]().  
+This repository holds all the necessary files to build ROCKs for the upstream versions we support. The Alertmanager ROCK is used by the [alertmanager-k8s-operator](https://github.com/canonical/alertmanager-k8s-operator) charm.
 
-## Usage
-```shell
-rockcraft pack -v
-```
+The ROCKs on this repository are built with [OCI Factory](https://github.com/canonical/oci-factory/), which also takes care of periodically rebuilding the images.
 
-## Manual verification
-```shell
-tar tf alertmanager_0.24.0_amd64.rock
-tar -O -xf alertmanager_0.24.0_amd64.rock oci-layout
+Automation takes care of:
+* validating PRs, by simply trying to build the ROCK;
+* pulling upstream releases, creating a PR with the necessary files to be manually reviewed;
+* releasing to GHCR at [ghcr.io/canonical/alertmanager:dev](https://ghcr.io/canonical/alertmanager:dev), when merging to main, for development purposes.
 
-skopeo --insecure-policy copy oci-archive:alertmanager_0.24.0_amd64.rock docker-daemon:alertmanager:0.24.0
-dive alertmanager:0.24.0
-
-docker run --rm -d -p 9093:9093 alertmanager:0.24.0
-curl localhost:9093/api/v1/alerts
-```
-
-## Build automation
-This repo has workflows in place to:
-- update `rockcraft.yaml` when new versions of alertmanager are published;
-- publish a new rock on every merge.

@@ -1,8 +1,8 @@
 name: alertmanager
 summary: Prometheus alertmanager in a ROCK.
 description: Alertmanager handles alerts sent by client applications such as the Prometheus server.
-version: "0.25.0"
-base: ubuntu:20.04
+version: "0.24.0"
+base: ubuntu:22.04
 license: Apache-2.0
 # Replicate the tree structure of the original image
 # https://github.com/prometheus/alertmanager/blob/main/Dockerfile
@@ -27,7 +27,7 @@ parts:
     plugin: go
     source: https://github.com/prometheus/alertmanager.git
     source-type: git
-    source-tag: "v0.25.0"
+    source-tag: "v0.24.0"
     # Override until this issue is fixed: https://github.com/canonical/rockcraft/issues/21
     build-snaps:
       - go/1.18/stable

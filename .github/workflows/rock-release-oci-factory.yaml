@@ -1,6 +1,7 @@
 name: Open a PR to OCI Factory
 
 on:
+  workflow_dispatch: {} # TODO: Test to see if this works
   push:
     branches:
       - main

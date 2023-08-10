@@ -31,6 +31,8 @@ parts:
     # Override until this issue is fixed: https://github.com/canonical/rockcraft/issues/21
     build-snaps:
       - go/1.18/stable
+    stage-packages:
+      - ca-certificates
     override-build: |
       set -x
       REVISION=$(git rev-parse --short HEAD)

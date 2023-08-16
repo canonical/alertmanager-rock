@@ -1,5 +1,6 @@
 # alertmanager-rock
 
+[![Open a PR to OCI Factory](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-release-oci-factory.yaml/badge.svg)](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-release-oci-factory.yaml)
 [![Publish to GHCR:dev](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-release-dev.yaml/badge.svg)](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-release-dev.yaml)
 [![Update ROCK](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-update.yaml/badge.svg)](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-update.yaml)
 

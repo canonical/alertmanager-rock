@@ -4,7 +4,7 @@
 [![Publish to GHCR:dev](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-release-dev.yaml/badge.svg)](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-release-dev.yaml)
 [![Update ROCK](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-update.yaml/badge.svg)](https://github.com/canonical/alertmanager-rock/actions/workflows/rock-update.yaml)
 
-[ROCKs](https://canonical-rockcraft.readthedocs-hosted.com/en/latest/) for [Alertmanager]().  
+[ROCKs](https://canonical-rockcraft.readthedocs-hosted.com/en/latest/) for [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/).  
 This repository holds all the necessary files to build ROCKs for the upstream versions we support. The Alertmanager ROCK is used by the [alertmanager-k8s-operator](https://github.com/canonical/alertmanager-k8s-operator) charm.
 
 The ROCKs on this repository are built with [OCI Factory](https://github.com/canonical/oci-factory/), which also takes care of periodically rebuilding the images.

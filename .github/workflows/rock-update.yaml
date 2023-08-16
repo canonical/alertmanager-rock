@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    uses: canonical/observability/.github/workflows/update-rock.yaml@main
+    uses: canonical/observability/.github/workflows/rock-update.yaml@main
     with:
       rock-name: alertmanager
       source-repo: prometheus/alertmanager

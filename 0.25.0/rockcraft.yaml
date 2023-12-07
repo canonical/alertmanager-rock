@@ -6,7 +6,6 @@ base: ubuntu:22.04
 license: Apache-2.0
 # Replicate the tree structure of the original image
 # https://github.com/prometheus/alertmanager/blob/main/Dockerfile
-
 # /
 # ├── bin
 # │   ├── alertmanager
@@ -14,7 +13,6 @@ license: Apache-2.0
 # └── etc
 #     └── alertmanager
 #         └── alertmanager.yml
-
 services:
   alertmanager:
     command: /bin/alertmanager --config.file=/etc/alertmanager/alertmanager.yml --storage.path=/alertmanager
@@ -61,3 +59,13 @@ parts:
   ca-certs:
     plugin: nil
     stage-packages: [ca-certificates]
+  # The security manifest is required when .deb packages are added to the ROCK
+  deb-security-manifest:
+    plugin: nil
+    after:
+      - alertmanager
+      - ca-certs
+    override-prime: |
+      set -x
+      mkdir -p $CRAFT_PRIME/usr/share/rocks/
+      (echo "# os-release" && cat /etc/os-release && echo "# dpkg-query" && dpkg-query --admindir=$CRAFT_PRIME/var/lib/dpkg/ -f '${db:Status-Abbrev},${binary:Package},${Version},${source:Package},${Source:Version}\n' -W) > $CRAFT_PRIME/usr/share/rocks/dpkg.query

@@ -1,0 +1,71 @@
+name: alertmanager
+summary: Prometheus alertmanager in a ROCK.
+description: Alertmanager handles alerts sent by client applications such as the Prometheus server.
+version: "0.27.0"
+base: ubuntu:22.04
+license: Apache-2.0
+# Replicate the tree structure of the original image
+# https://github.com/prometheus/alertmanager/blob/main/Dockerfile
+# /
+# ├── bin
+# │   ├── alertmanager
+# │   └── amtool
+# └── etc
+#     └── alertmanager
+#         └── alertmanager.yml
+services:
+  alertmanager:
+    command: /bin/alertmanager --config.file=/etc/alertmanager/alertmanager.yml --storage.path=/alertmanager
+    override: replace
+    startup: enabled
+platforms:
+  amd64:
+parts:
+  alertmanager:
+    plugin: go
+    source: https://github.com/prometheus/alertmanager.git
+    source-type: git
+    source-tag: "v0.27.0"
+    # Override until this issue is fixed: https://github.com/canonical/rockcraft/issues/21
+    build-snaps:
+      - go/1.21/stable
+    stage-packages:
+      - ca-certificates
+    override-build: |
+      set -x
+      REVISION=$(git rev-parse --short HEAD)
+      BRANCH=$(git rev-parse --abbrev-ref HEAD)
+      go build \
+        -ldflags="-X github.com/prometheus/common/version.Version=$(cat ./VERSION) -X github.com/prometheus/common/version.Revision=${REVISION} -X github.com/prometheus/common/version.Branch=${BRANCH} -X github.com/prometheus/common/version.BuildUser=$(whoami)@$(hostname) -X github.com/prometheus/common/version.BuildDate=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+        -o bin/alertmanager \
+        ./cmd/alertmanager
+      go build \
+        -ldflags="-X github.com/prometheus/common/version.Version=$(cat ./VERSION) -X github.com/prometheus/common/version.Revision=${REVISION} -X github.com/prometheus/common/version.Branch=${BRANCH} -X github.com/prometheus/common/version.BuildUser=$(whoami)@$(hostname) -X github.com/prometheus/common/version.BuildDate=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+        -o bin/amtool \
+        ./cmd/amtool
+        install -D -m755 bin/alertmanager ${CRAFT_PART_INSTALL}/bin/alertmanager
+        install -D -m755 bin/amtool ${CRAFT_PART_INSTALL}/bin/amtool
+    stage:
+      - bin/alertmanager
+      - bin/amtool
+  default-config:
+    plugin: dump
+    source: .
+    organize:
+      alertmanager.yml: etc/alertmanager/alertmanager.yml
+    stage:
+      - etc/alertmanager/alertmanager.yml
+  # We moved this here because: https://github.com/canonical/rockcraft/issues/343
+  ca-certs:
+    plugin: nil
+    stage-packages: [ca-certificates]
+  # The security manifest is required when .deb packages are added to the ROCK
+  deb-security-manifest:
+    plugin: nil
+    after:
+      - alertmanager
+      - ca-certs
+    override-prime: |
+      set -x
+      mkdir -p $CRAFT_PRIME/usr/share/rocks/
+      (echo "# os-release" && cat /etc/os-release && echo "# dpkg-query" && dpkg-query --admindir=$CRAFT_PRIME/var/lib/dpkg/ -f '${db:Status-Abbrev},${binary:Package},${Version},${source:Package},${Source:Version}\n' -W) > $CRAFT_PRIME/usr/share/rocks/dpkg.query

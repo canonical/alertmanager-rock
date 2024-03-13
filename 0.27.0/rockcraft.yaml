@@ -2,7 +2,7 @@ name: alertmanager
 summary: Prometheus alertmanager in a ROCK.
 description: Alertmanager handles alerts sent by client applications such as the Prometheus server.
 version: "0.27.0"
-base: ubuntu:22.04
+base: ubuntu@22.04
 license: Apache-2.0
 # Replicate the tree structure of the original image
 # https://github.com/prometheus/alertmanager/blob/main/Dockerfile
@@ -58,7 +58,7 @@ parts:
   # We moved this here because: https://github.com/canonical/rockcraft/issues/343
   ca-certs:
     plugin: nil
-    stage-packages: [ca-certificates]
+    overlay-packages: [ca-certificates]
   # The security manifest is required when .deb packages are added to the ROCK
   deb-security-manifest:
     plugin: nil

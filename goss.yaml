@@ -1,0 +1,10 @@
+process:
+  alertmanager:
+    running: true
+package:
+  ca-certificates:
+    installed: true
+http:
+  healthy:
+    status: 200
+    url: http://localhost:9093/-/healthy

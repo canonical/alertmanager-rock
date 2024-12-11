@@ -3,7 +3,7 @@ name: Update rock
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: '0 0,4,8,12,16,20 * * *'
+    - cron: '0 0 * * *'
 
 jobs:
   build:
@@ -12,3 +12,4 @@ jobs:
       rock-name: alertmanager
       source-repo: prometheus/alertmanager
       check-go: true
+    secrets: inherit

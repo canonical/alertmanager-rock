@@ -1,9 +1,6 @@
 process:
   alertmanager:
     running: true
-package:
-  ca-certificates:
-    installed: true
 http:
   healthy:
     status: 200

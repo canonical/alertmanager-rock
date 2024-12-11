@@ -1,8 +1,6 @@
 set quiet # Recipes are silent by default
 set export # Just variables are exported to environment variables
 
-kgoss := `which kgoss` # `kgoss` is required
-
 rock_name := `echo ${PWD##*/} | sed 's/-rock//'`
 latest_version := `find . -maxdepth 1 -type d | sort -V | tail -n1 | sed 's@./@@'`
 

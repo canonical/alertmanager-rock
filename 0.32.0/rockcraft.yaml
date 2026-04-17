@@ -29,10 +29,13 @@ parts:
     # Override until this issue is fixed: https://github.com/canonical/rockcraft/issues/21
     build-snaps:
       - go/1.25/candidate
+      - node/24/stable
     stage-packages:
       - ca-certificates
     override-build: |
       set -x
+      # Build the frontend UI (required since v0.32.0 uses //go:embed app/dist)
+      cd ui/app && npm ci && npm run build && cd ../..
       REVISION=$(git rev-parse --short HEAD)
       BRANCH=$(git rev-parse --abbrev-ref HEAD)
       go build \

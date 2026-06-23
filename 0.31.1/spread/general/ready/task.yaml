@@ -4,4 +4,7 @@ environment:
   GOSS_FILE: "../../../goss.yaml"
 
 execute: |
-  dgoss run rockcraft-test:latest
+  mkdir data
+  sudo chown 584792:584792 data
+
+  dgoss run -v "$(pwd)/data":/alertmanager rockcraft-test:latest

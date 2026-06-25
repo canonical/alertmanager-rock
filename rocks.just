@@ -56,9 +56,23 @@ test version=latest_version:
   #!/usr/bin/env bash
   set -e
   cp spread.yaml "{{version}}/spread.yaml"
-  if [ -f goss.yaml ]; then cp goss.yaml "{{version}}/goss.yaml"; fi
+  goss_mode=""
+  if [ -f goss.yaml ] && [ -f "{{version}}/goss.yaml" ]; then
+    # Merge root-level goss.yaml with version-specific goss.yaml
+    cp "{{version}}/goss.yaml" "{{version}}/goss.yaml.bak"
+    yq eval-all '. as $item ireduce ({}; . * $item)' goss.yaml "{{version}}/goss.yaml" > "{{version}}/goss_merged.yaml"
+    mv "{{version}}/goss_merged.yaml" "{{version}}/goss.yaml"
+    goss_mode="merged"
+  elif [ -f goss.yaml ]; then
+    cp goss.yaml "{{version}}/goss.yaml"
+    goss_mode="copied"
+  fi
   test_exit=0; (cd "{{version}}" && rockcraft test) || test_exit=$?
-  rm -f "{{version}}/spread.yaml" "{{version}}/goss.yaml"
+  rm -f "{{version}}/spread.yaml"
+  case "$goss_mode" in
+    merged) mv "{{version}}/goss.yaml.bak" "{{version}}/goss.yaml" ;;
+    copied) rm -f "{{version}}/goss.yaml" ;;
+  esac
   if [ "$test_exit" -ne 0 ]; then echo "× rockcraft test failed"; exit "$test_exit"; fi
   echo "✓ 'rockcraft test' passed."
 

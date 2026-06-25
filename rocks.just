@@ -57,7 +57,7 @@ test version=latest_version:
   set -e
   cp spread.yaml "{{version}}/spread.yaml"
   if [ -f "{{version}}/goss.custom.yaml" ]; then
-    yq eval-all '. as $item ireduce ({}; . * $item)' goss.yaml "{{version}}/goss.custom.yaml" > "{{version}}/goss.yaml"
+    yq eval-all '. as $item ireduce ({}; . * $item)' goss.yaml "{{version}}/goss.custom.yaml" | cat > "{{version}}/goss.yaml"
   elif [ -f goss.yaml ]; then
     cp goss.yaml "{{version}}/goss.yaml"
   fi

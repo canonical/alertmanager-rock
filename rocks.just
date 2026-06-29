@@ -56,7 +56,11 @@ test version=latest_version:
   #!/usr/bin/env bash
   set -e
   cp spread.yaml "{{version}}/spread.yaml"
-  if [ -f goss.yaml ]; then cp goss.yaml "{{version}}/goss.yaml"; fi
+  if [ -f "{{version}}/goss.custom.yaml" ]; then
+    yq eval-all '. as $item ireduce ({}; . * $item)' goss.yaml "{{version}}/goss.custom.yaml" | cat > "{{version}}/goss.yaml"
+  elif [ -f goss.yaml ]; then
+    cp goss.yaml "{{version}}/goss.yaml"
+  fi
   test_exit=0; (cd "{{version}}" && rockcraft test) || test_exit=$?
   rm -f "{{version}}/spread.yaml" "{{version}}/goss.yaml"
   if [ "$test_exit" -ne 0 ]; then echo "× rockcraft test failed"; exit "$test_exit"; fi

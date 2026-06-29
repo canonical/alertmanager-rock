@@ -1,0 +1,43 @@
+# Non-root compliance checks for alertmanager 0.31.1
+# Verifies that the image runs as _daemon_ (uid/gid 584792) and that
+# all paths required by the charm are accessible by _daemon_.
+
+command:
+  id -u:
+    exit-status: 0
+    stdout:
+      - "584792"
+  id -g:
+    exit-status: 0
+    stdout:
+      - "584792"
+  sh -c 'test -w /etc/alertmanager/':
+    exit-status: 0
+  sh -c 'test -d /etc/amtool/ && test -w /etc/amtool/':
+    exit-status: 0
+  sh -c 'test -w /usr/local/share/ca-certificates/':
+    exit-status: 0
+  sh -c 'test -w /etc/ssl/certs/':
+    exit-status: 0
+
+file:
+  /etc/alertmanager:
+    exists: true
+    owner: _daemon_
+    group: _daemon_
+    filetype: directory
+  /etc/amtool:
+    exists: true
+    owner: _daemon_
+    group: _daemon_
+    filetype: directory
+  /usr/local/share/ca-certificates:
+    exists: true
+    owner: _daemon_
+    group: _daemon_
+    filetype: directory
+  /etc/ssl/certs:
+    exists: true
+    owner: _daemon_
+    group: _daemon_
+    filetype: directory

@@ -20,6 +20,9 @@ services:
     startup: enabled
 platforms:
   amd64:
+
+run_user: _daemon_
+
 parts:
   alertmanager:
     plugin: go
@@ -60,6 +63,37 @@ parts:
     plugin: nil
     overlay-packages: [ca-certificates]
   # The security manifest is required when .deb packages are added to the ROCK
+  user-setup:
+    plugin: nil
+    after:
+      - alertmanager
+      - default-config
+      - ca-certs
+    override-prime: |
+      # Please refer to https://discourse.ubuntu.com/t/unifying-user-identity-across-snaps-and-rocks/36469
+      # for more information about shared user.
+      AM_GID=584792
+      AM_UID=584792
+
+      craftctl default
+
+      # alertmanager config directory
+      chown -R ${AM_UID}:${AM_GID} etc/alertmanager/
+      chmod -R 750 etc/alertmanager/
+
+      # amtool config directory (create it so _daemon_ can write to it)
+      mkdir -p etc/amtool/
+      chown -R ${AM_UID}:${AM_GID} etc/amtool/
+      chmod -R 750 etc/amtool/
+
+      # CA certificates directory for receiving certs via Juju relation
+      chown -R ${AM_UID}:${AM_GID} usr/local/share/ca-certificates/
+      chmod -R 755 usr/local/share/ca-certificates/
+
+      # SSL certs directory for update-ca-certificates output
+      chown -R ${AM_UID}:${AM_GID} etc/ssl/certs/
+      chmod -R 755 etc/ssl/certs/
+
   deb-security-manifest:
     plugin: nil
     after:

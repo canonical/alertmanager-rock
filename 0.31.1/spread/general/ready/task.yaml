@@ -4,4 +4,9 @@ environment:
   GOSS_FILE: "../../../goss.yaml"
 
 execute: |
-  dgoss run rockcraft-test:latest
+  mkdir data
+  sudo chown 584792:584792 data
+
+  # The volume mounts should ideally match the ones defined in the charm
+  # https://github.com/canonical/alertmanager-k8s-operator/blob/main/charmcraft.yaml
+  dgoss run -v "$(pwd)/data":/alertmanager rockcraft-test:latest

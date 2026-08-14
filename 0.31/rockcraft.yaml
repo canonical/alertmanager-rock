@@ -1,8 +1,8 @@
 name: alertmanager
 summary: Prometheus alertmanager in a ROCK.
 description: Alertmanager handles alerts sent by client applications such as the Prometheus server.
-version: "0.26.0"
-base: ubuntu@22.04
+version: "0.31.1"
+base: ubuntu@26.04
 license: Apache-2.0
 # Replicate the tree structure of the original image
 # https://github.com/prometheus/alertmanager/blob/main/Dockerfile
@@ -25,10 +25,10 @@ parts:
     plugin: go
     source: https://github.com/prometheus/alertmanager.git
     source-type: git
-    source-tag: "v0.26.0"
+    source-tag: "v0.31.1"
     # Override until this issue is fixed: https://github.com/canonical/rockcraft/issues/21
     build-snaps:
-      - go/1.18/stable
+      - go/1.24/candidate
     stage-packages:
       - ca-certificates
     override-build: |
@@ -43,11 +43,11 @@ parts:
         -ldflags="-X github.com/prometheus/common/version.Version=$(cat ./VERSION) -X github.com/prometheus/common/version.Revision=${REVISION} -X github.com/prometheus/common/version.Branch=${BRANCH} -X github.com/prometheus/common/version.BuildUser=$(whoami)@$(hostname) -X github.com/prometheus/common/version.BuildDate=$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
         -o bin/amtool \
         ./cmd/amtool
-        install -D -m755 bin/alertmanager ${CRAFT_PART_INSTALL}/bin/alertmanager
-        install -D -m755 bin/amtool ${CRAFT_PART_INSTALL}/bin/amtool
+        install -D -m755 bin/alertmanager ${CRAFT_PART_INSTALL}/usr/bin/alertmanager
+        install -D -m755 bin/amtool ${CRAFT_PART_INSTALL}/usr/bin/amtool
     stage:
-      - bin/alertmanager
-      - bin/amtool
+      - usr/bin/alertmanager
+      - usr/bin/amtool
   default-config:
     plugin: dump
     source: .

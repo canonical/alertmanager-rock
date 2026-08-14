@@ -26,10 +26,15 @@ source_repo := ''
 @name:
   echo "{{rock_name}}"
 
+# Print the latest major.minor version
+[group("info")]
+@latest-version:
+  echo "{{latest_version}}"
+
 # Push an OCI image to a local registry
 [private]
 @push-to-registry version=latest_version:
-  which -s docker || { echo "docker not found"; exit 1; }
+  which -s docker || { echo "× docker not found"; exit 1; }
   test -f "{{version}}"/*.rock || (cd "{{version}}" && rockcraft pack)
   echo "Pushing {{version}} to local docker registry"
   cd {{version}}; sudo rockcraft.skopeo --insecure-policy copy --dest-tls-verify=false "oci-archive:$(ls *.rock)" docker-daemon:rockcraft-test:latest

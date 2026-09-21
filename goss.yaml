@@ -1,6 +1,29 @@
 process:
   alertmanager:
     running: true
+command:
+  alertmanager-user:
+    exec: id -u
+    exit-status: 0
+    stdout:
+      - "584792"
+  alertmanager-group:
+    exec: id -g
+    exit-status: 0
+    stdout:
+      - "584792"
+  alertmanager-config-writable:
+    exec: test -w /etc/alertmanager
+    exit-status: 0
+  amtool-config-writable:
+    exec: test -w /etc/amtool
+    exit-status: 0
+  ca-certificates-writable:
+    exec: test -w /usr/local/share/ca-certificates
+    exit-status: 0
+  alertmanager-data-writable:
+    exec: test -w /alertmanager
+    exit-status: 0
 http:
   healthy:
     status: 200

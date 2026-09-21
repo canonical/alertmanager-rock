@@ -4,6 +4,7 @@ description: Alertmanager handles alerts sent by client applications such as the
 version: "0.34.0"
 base: ubuntu@26.04
 license: Apache-2.0
+run_user: _daemon_
 # Replicate the tree structure of the original image
 # https://github.com/prometheus/alertmanager/blob/main/Dockerfile
 # /
@@ -64,6 +65,32 @@ parts:
   ca-certs:
     plugin: nil
     overlay-packages: [ca-certificates]
+  user-setup:
+    plugin: nil
+    after:
+      - alertmanager
+      - default-config
+      - ca-certs
+    override-prime: |
+      set -eux
+      APP_UID=584792
+      APP_GID=584792
+
+      mkdir -p \
+        $CRAFT_PRIME/alertmanager \
+        $CRAFT_PRIME/etc/alertmanager \
+        $CRAFT_PRIME/etc/amtool \
+        $CRAFT_PRIME/usr/local/share/ca-certificates
+      chown -R ${APP_UID}:${APP_GID} \
+        $CRAFT_PRIME/alertmanager \
+        $CRAFT_PRIME/etc/alertmanager \
+        $CRAFT_PRIME/etc/amtool \
+        $CRAFT_PRIME/usr/local/share/ca-certificates
+      chmod -R 750 \
+        $CRAFT_PRIME/alertmanager \
+        $CRAFT_PRIME/etc/alertmanager \
+        $CRAFT_PRIME/etc/amtool \
+        $CRAFT_PRIME/usr/local/share/ca-certificates
   # The security manifest is required when .deb packages are added to the ROCK
   deb-security-manifest:
     plugin: nil

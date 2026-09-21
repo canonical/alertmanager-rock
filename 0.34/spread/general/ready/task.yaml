@@ -4,4 +4,7 @@ environment:
   GOSS_FILE: "../../../goss.yaml"
 
 execute: |
-  dgoss run rockcraft-test:latest
+  storage_dir=$(mktemp -d)
+  trap 'rm -rf "$storage_dir"' EXIT
+  chown 584792:584792 "$storage_dir"
+  dgoss run -v "$storage_dir:/alertmanager" rockcraft-test:latest

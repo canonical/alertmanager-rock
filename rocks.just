@@ -163,7 +163,7 @@ update:
     if [[ "$current" == "$version" ]]; then echo "→ $folder already at $version"; continue; fi
     echo "Updating $folder: $current → $version (source-tag $tag)"
     just write-version "$folder" "$version" "$tag"
-    updated_folders="$updated_folders $folder"
+    updated_folders="${updated_folders:+$updated_folders }$folder"
   done
   if [[ -n "$updated_folders" ]]; then echo; echo "✓ Versions updated"; fi
 
@@ -226,6 +226,7 @@ release-oci-factory version=latest_version support="minor" risk="stable":
     --support="{{support}}" \
     --risk="{{risk}}" \
     --version="$rock_version" \
+    --directory="$(git rev-parse --show-prefix)" \
     | tee "$manifest_file"
   echo; echo "✓ OCI Factory manifest generated"
   # If there's nothing to upload, exit early
